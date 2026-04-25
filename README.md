@@ -14,14 +14,29 @@ Official Dart SDK for the [Cryptohopper](https://www.cryptohopper.com) API.
 
 ## Install
 
+> **Note:** the package is not yet on pub.dev. The first publish requires a one-time manual upload to bootstrap the package and attach automated publishing â€” see [PUBLISHING.md](PUBLISHING.md). Until that lands, install via the git URL below.
+
+### From git (works today)
+
 ```yaml
 # pubspec.yaml
 dependencies:
-  cryptohopper: ^0.1.0-alpha.1
+  cryptohopper:
+    git:
+      url: https://github.com/cryptohopper/cryptohopper-dart-sdk
+      ref: v0.1.0-alpha.1
 ```
 
 ```bash
 dart pub get
+```
+
+### From pub.dev (once published)
+
+```yaml
+# pubspec.yaml
+dependencies:
+  cryptohopper: ^0.1.0-alpha.1
 ```
 
 Requires Dart 3.0 or newer. Works on the Dart VM, AOT-compiled binaries, and Flutter on every supported platform (iOS, Android, web, desktop).
@@ -104,7 +119,7 @@ try {
 }
 ```
 
-Codes are stable across every official Cryptohopper SDK (Node, Python, Go, Ruby, Rust, PHP, Dart). Compare with `==`, never substring-match.
+Codes are stable across every official Cryptohopper SDK (Node, Python, Go, Ruby, Rust, PHP, Dart, Swift). Compare with `==`, never substring-match.
 
 ## Rate limits
 
@@ -148,6 +163,7 @@ Semantic versioning. While on `0.x`, minor releases can ship breaking changes â€
 | Ruby | `gem install cryptohopper --pre` |
 | Rust | `cargo add cryptohopper` |
 | PHP | `composer require cryptohopper/sdk` |
+| Swift | Add `https://github.com/cryptohopper/cryptohopper-swift-sdk` via SwiftPM |
 | CLI | `npm i -g @cryptohopper/cli` or [download a binary](https://github.com/cryptohopper/cryptohopper-cli/releases/latest) |
 
 ## License
