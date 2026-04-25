@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Dart ${{ matrix.dart }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dart: ['stable', '3.0']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.dart }}
+
+      - run: dart pub get
+
+      - name: Verify formatting
+        if: matrix.dart == 'stable'
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyse
+        run: dart analyze --fatal-infos
+
+      - name: Run tests
+        run: dart test

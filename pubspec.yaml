@@ -1,0 +1,24 @@
+name: cryptohopper
+description: Official Dart SDK for the Cryptohopper API. Async, null-safe, typed exceptions, auto-retry on 429, full coverage of all 18 public API domains.
+version: 0.1.0-alpha.1
+homepage: https://www.cryptohopper.com
+repository: https://github.com/cryptohopper/cryptohopper-dart-sdk
+issue_tracker: https://github.com/cryptohopper/cryptohopper-dart-sdk/issues
+documentation: https://pub.dev/documentation/cryptohopper/latest/
+
+topics:
+  - cryptohopper
+  - trading
+  - crypto
+  - api-client
+  - sdk
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  http: ^1.2.0
+
+dev_dependencies:
+  test: ^1.24.0
+  lints: ^4.0.0

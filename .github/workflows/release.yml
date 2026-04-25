@@ -1,0 +1,81 @@
+name: Release
+
+# This repo uses bare `v*` tags so pub.dev (and the Dart toolchain) can read
+# the SemVer directly from the tag. Same convention as the Go and PHP SDKs.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write   # Reserved for pub.dev OIDC trusted publishing once enabled.
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - run: dart pub get
+
+      - name: Tag parity check
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | sed 's/^version: *//')
+          DART_VERSION=$(grep "sdkVersion = " lib/src/version.dart | sed -E "s/.*= '(.+)';/\1/")
+          echo "Tag version       : ${TAG_VERSION}"
+          echo "pubspec.yaml      : ${PUBSPEC_VERSION}"
+          echo "version.dart      : ${DART_VERSION}"
+          if [ "${TAG_VERSION}" != "${PUBSPEC_VERSION}" ]; then
+            echo "Tag and pubspec.yaml#version disagree — aborting"
+            exit 1
+          fi
+          if [ "${TAG_VERSION}" != "${DART_VERSION}" ]; then
+            echo "Tag and lib/src/version.dart#sdkVersion disagree — aborting"
+            exit 1
+          fi
+
+      - name: Analyse
+        run: dart analyze --fatal-infos
+
+      - name: Run tests
+        run: dart test
+
+      - name: Determine prerelease flag
+        id: prerelease
+        run: |
+          if [[ "${GITHUB_REF_NAME}" =~ -(alpha|beta|rc) ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          prerelease: ${{ steps.prerelease.outputs.prerelease }}
+          generate_release_notes: true
+          body: |
+            ## Installation
+
+            ```yaml
+            # pubspec.yaml
+            dependencies:
+              cryptohopper: ${{ github.ref_name }}
+            ```
+
+            See [CHANGELOG.md](https://github.com/cryptohopper/cryptohopper-dart-sdk/blob/main/CHANGELOG.md) for what changed.
+
+      # Publishing to pub.dev is gated on a trusted-publisher relationship
+      # being set up on the package's pub.dev page (Admin → Automated
+      # publishing → GitHub Actions). Until that's done, the build above is
+      # green but no upload happens. Once enabled, uncomment the step below
+      # and the next tag push will publish.
+      #
+      # - name: Publish to pub.dev
+      #   uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
