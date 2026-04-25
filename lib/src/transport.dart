@@ -91,6 +91,13 @@ class Transport {
     headers.forEach((k, v) => request.headers[k] = v);
     if (payload != null) request.body = payload;
 
+    // Single deadline for the entire request lifecycle. send() resolves
+    // once response headers arrive; the body is then drained in
+    // Response.fromStream(). A naïve `.timeout(_timeout)` on send() alone
+    // would let a slow or stalled response body hang the call indefinitely.
+    // We split the deadline so the total never exceeds `_timeout`.
+    final deadline = DateTime.now().add(_timeout);
+
     http.StreamedResponse streamed;
     try {
       streamed = await _httpClient.send(request).timeout(_timeout);
@@ -114,7 +121,38 @@ class Transport {
       );
     }
 
-    final response = await http.Response.fromStream(streamed);
+    final remaining = deadline.difference(DateTime.now());
+    if (remaining.isNegative || remaining == Duration.zero) {
+      throw CryptohopperException(
+        code: 'TIMEOUT',
+        message: 'Response body read timed out after ${_timeout.inSeconds}s',
+        status: 0,
+      );
+    }
+
+    http.Response response;
+    try {
+      response = await http.Response.fromStream(streamed).timeout(remaining);
+    } on TimeoutException catch (e) {
+      throw CryptohopperException(
+        code: 'TIMEOUT',
+        message: 'Response body read timed out after ${_timeout.inSeconds}s: ${e.message ?? ''}',
+        status: 0,
+      );
+    } on SocketException catch (e) {
+      throw CryptohopperException(
+        code: 'NETWORK_ERROR',
+        message: 'Failed to read response body (${e.message})',
+        status: 0,
+      );
+    } on HttpException catch (e) {
+      throw CryptohopperException(
+        code: 'NETWORK_ERROR',
+        message: 'Failed to read response body: ${e.message}',
+        status: 0,
+      );
+    }
+
     return _handleResponse(response);
   }
 
