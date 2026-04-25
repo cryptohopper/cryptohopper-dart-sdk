@@ -74,7 +74,9 @@ void main() {
 
       final req = backend.last;
       expect(req.method, 'POST');
-      expect(req.headers['Content-Type'], 'application/json');
+      // Dart's http.Request appends `; charset=utf-8` automatically when the
+      // body is a string, so match the prefix instead of exact equality.
+      expect(req.headers['Content-Type'], startsWith('application/json'));
       expect(backend.lastBodyJson(), {'name': 'test-bot', 'exchange': 'binance'});
     });
   });
