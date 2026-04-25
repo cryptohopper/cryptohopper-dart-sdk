@@ -10,6 +10,8 @@ Official Dart SDK for the [Cryptohopper](https://www.cryptohopper.com) API.
 
 > **Status: 0.1.0-alpha.1** — full coverage of all 18 public API domains: `user`, `hoppers`, `exchange`, `strategy`, `backtest`, `market`, `signals`, `arbitrage`, `marketmaker`, `template`, `ai`, `platform`, `chart`, `subscription`, `social`, `tournaments`, `webhooks`, `app`.
 
+**Deeper docs:** [Getting Started](docs/Getting-Started.md) · [Authentication](docs/Authentication.md) · [Error Handling](docs/Error-Handling.md) · [Rate Limits](docs/Rate-Limits.md)
+
 ## Install
 
 ```yaml
