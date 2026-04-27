@@ -177,8 +177,11 @@ class Transport {
   }
 
   Map<String, String> _buildHeaders({required bool hasBody}) {
+    // Cryptohopper Public API v1 uses `access-token: <token>`, not the
+    // OAuth2-conventional `Authorization: Bearer <token>`. The gateway in
+    // front of the API rejects Bearer with a SigV4 parse error.
     final headers = <String, String>{
-      'Authorization': 'Bearer $_apiKey',
+      'access-token': _apiKey,
       'Accept': 'application/json',
       'User-Agent': _buildUserAgent(),
     };

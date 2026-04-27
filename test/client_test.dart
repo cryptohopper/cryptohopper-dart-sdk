@@ -13,12 +13,14 @@ void main() {
       );
     });
 
-    test('sends bearer token + user agent on every request', () async {
+    test('sends access-token + user agent on every request', () async {
       final backend = MockBackend([http.Response('{"data":{"id":1}}', 200)]);
       await backend.client.user.get();
 
       final req = backend.last;
-      expect(req.headers['Authorization'], 'Bearer test-token');
+      expect(req.headers['access-token'], 'test-token');
+      expect(req.headers.containsKey('Authorization'), isFalse,
+          reason: 'Cryptohopper v1 uses access-token, not Authorization: Bearer');
       expect(req.headers['User-Agent'], startsWith('cryptohopper-sdk-dart/$sdkVersion'));
       expect(req.headers['Accept'], 'application/json');
       expect(req.headers.containsKey('x-api-app-key'), isFalse);
