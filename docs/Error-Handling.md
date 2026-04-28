@@ -31,7 +31,7 @@ try {
 | `SERVER_ERROR` | 500–502, 504 | Cryptohopper's end | Retry with back-off |
 | `SERVICE_UNAVAILABLE` | 503 | Planned maintenance or downstream outage | Respect `retryAfterMs`; retry |
 | `NETWORK_ERROR` | — | DNS failure, TCP reset, TLS handshake failure | Retry; check your network |
-| `TIMEOUT` | — | Hit the client-side `timeout:` (covers connect AND body read since iter-12) | Retry; bump timeout if legitimately slow |
+| `TIMEOUT` | — | Hit the client-side `timeout:` — covers both connect and body-read | Retry; bump timeout if legitimately slow |
 | `UNKNOWN` | any | Anything else the SDK didn't recognise | Inspect `e.status` and `e.message` |
 
 These strings are stable across SDK versions and are also exposed as `CryptohopperException.knownCodes` — compare with `==`, never substring-match.
