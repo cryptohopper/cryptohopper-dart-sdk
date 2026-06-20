@@ -17,7 +17,7 @@ jobs:
       matrix:
         dart: ['stable', '3.2']
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.dart }}
